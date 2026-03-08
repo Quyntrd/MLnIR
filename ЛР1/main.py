@@ -5,22 +5,53 @@ from numpy.linalg import det, inv
 from utility import *
 
 LOG_PATH = "logs\\"
-np.random.seed(0)  # чтобы результаты воспроизводились
+rng = np.random.default_rng(7)  # чтобы результаты воспроизводились
 N = 200
 
-M1 = np.array([0.0, 1.0])
-M2 = np.array([1.0, -1.0])
-M3 = np.array([-2.0, 1.0])
-B1 = np.array([[2.0, 0.0],
-               [0.0, 1.0]])
+M1 = np.array([1.0, 0.0]) # 11 вариант
+M2 = np.array([-2.0, -2.0])
+M3 = np.array([1.0, 2.0])
 
-B2 = np.array([[1.0, -0.4],
-               [-0.4, 2.0]])
+B1 = np.array([[1.0, -0.9],
+               [-0.9, 1.0]])
 
-B3 = np.array([[1.5, 0.9],
-               [0.9, 1.5]])
-B_equal = np.array([[2.0, 0.8],
-                    [0.8, 1.5]])
+B2 = np.array([[1.0, 0],
+               [0, 1.0]])
+               
+
+B3 = np.array([[1.0, 0.9],
+               [0.9, 1.0]])
+
+B_equal = np.array([[1.0, 0.2],
+                    [0.2, 1.0]])
+
+proto1 = np.array([
+    [1,0,0,1,0,0,1,0,0],
+    [1,0,0,1,0,0,1,0,0],
+    [1,0,0,1,0,0,1,0,0],
+    [1,0,0,1,0,0,1,0,0],
+    [1,0,0,1,0,0,1,0,0],
+    [1,0,0,1,0,0,1,0,0],
+    [1,0,0,1,0,0,1,0,0],
+    [1,1,1,1,1,1,1,1,1],
+    [0,0,0,0,0,0,0,0,1]
+], dtype=int)
+
+proto2 = np.array([
+    [0,1,0,0,0,0,0,0,0],
+    [0,1,0,0,0,0,0,0,0],
+    [0,1,0,0,0,0,0,0,0],
+    [0,1,1,1,1,1,0,0,0],
+    [0,1,0,0,0,0,1,0,0],
+    [0,1,0,0,0,0,0,1,0],
+    [0,1,0,0,0,0,0,1,0],
+    [0,1,0,0,0,0,1,0,0],
+    [0,1,1,1,1,1,0,0,0]
+], dtype=int)
+
+# Переводим в векторы длины 81
+p1_proto = proto1.flatten()
+p2_proto = proto2.flatten()
 
 X1 = simulate_normal(M1, B_equal, N)
 X2 = simulate_normal(M2, B_equal, N)
@@ -56,7 +87,7 @@ M2_est, B2_est = estimate_params(X2)
 rho_b_eq = bhattacharyya_distance(M1_est, B1_est, M2_est, B2_est)
 rho_m_eq = mahalanobis_distance(M1_est, M2_est, B_equal)
 
-print("== Равные корреляционные матрицы ==")
+print("------------------------ Равные корреляционные матрицы ------------------------")
 print("Исходные M1:", M1, "M2:", M2)
 print("Оценки M1^:", M1_est, "M2^:", M2_est)
 print("Оценки B1^:\n", B1_est)
@@ -95,19 +126,41 @@ pairs = [
     ("2-3", M2_3_est, B2_est_3, M3_3_est, B3_est_3),
 ]
 
-print("== Разные корреляционные матрицы ==")
+print("------------------------ Разные корреляционные матрицы ------------------------")
 for name, Ma, Ba, Mb, Bb in pairs:
     rho_b = bhattacharyya_distance(Ma, Ba, Mb, Bb)
     print(f"Пара {name}: расстояние Бхатачария = {rho_b}")
 
-p1 = np.array([0.5, 0.3, 0.5, 0.3, 0.5])  # Вектор 1: p=0.3 на 2 и 4 компоненте
-p2 = np.array([0.3, 0.3, 0.3, 0.3, 0.3])  # Вектор 2: p=0.3 на всех компонентах (пример)
+print("Исходные M1:", M1, "M2:", M2, "M3:", M3)
+print("Оценки M1^:", M1_3_est, "M2^:", M2_3_est, "M3^:", M3_3_est)
+print("Оценки B1^:\n", B1_est_3)
+print("Оценки B2^:\n", B2_est_3)
+print("Оценки B3^:\n", B3_est_3)
 
-bin_vecs_1 = simulate_binary_vector(p1, N)
-bin_vecs_2 = simulate_binary_vector(p2, N)
+epsilon = 0.3  # 30% шум
+
+bin_vecs_1 = simulate_binary_vector(p1_proto, N, epsilon, rng).T
+bin_vecs_2 = simulate_binary_vector(p2_proto, N, epsilon, rng).T
 
 np.save(LOG_PATH + "binary_1.npy", bin_vecs_1)
 np.save(LOG_PATH + "binary_2.npy", bin_vecs_2)
 
-print("Частоты единиц по компонентам (вектор 1):", bin_vecs_1.mean(axis=0))
-print("Частоты единиц по компонентам (вектор 2):", bin_vecs_2.mean(axis=0))
+print("Частоты единиц по компонентам (вектор 1):\n", bin_vecs_1.mean(axis=0))
+print("Частоты единиц по компонентам (вектор 2):\n", bin_vecs_2.mean(axis=0))
+
+mean_img1 = bin_vecs_1.mean(axis=0).reshape(9, 9)
+mean_img2 = bin_vecs_2.mean(axis=0).reshape(9, 9)
+
+plt.figure(figsize=(6,3))
+plt.subplot(1,2,1); plt.title("Средняя частота proto1"); plt.imshow(mean_img1, cmap="gray"); plt.axis("off")
+plt.subplot(1,2,2); plt.title("Средняя частота proto2"); plt.imshow(mean_img2, cmap="gray"); plt.axis("off")
+plt.tight_layout()
+plt.show()
+
+p1_proto = proto1.flatten()
+change_rate1 = np.mean(bin_vecs_1 != p1_proto)
+print("Фактическая доля изменённых битов для v1:", change_rate1)
+
+p2_proto = proto2.flatten()
+change_rate2 = np.mean(bin_vecs_2 != p2_proto)
+print("Фактическая доля изменённых битов для v1:", change_rate2)

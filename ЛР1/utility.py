@@ -24,24 +24,25 @@ def simulate_normal(M, B, N):
     B11 = B[1, 1]
 
     a00 = np.sqrt(B00)
-    a01 = B01 / a00
-    a11 = np.sqrt(B11 - a01**2)
+    a10 = B01 / a00
+    a11 = np.sqrt(max(0, B11 - (B01**2 / B00)))
 
-    A = np.array([[a00, a01],
-                  [0.0, a11]])
+    A = np.array([[a00, 0],
+                  [a10, a11]])
     
     xi = np.random.randn(N, 2)      # ξ ~ N(0, I)
     X = xi @ A.T + M                # X = A ξ + M
     return X
 
-def simulate_binary_vector(p, N):
+def simulate_binary_vector(rep_2d: np.ndarray, N: int, p: float, rng: np.random.Generator):
     """
     Моделирование выборки N бинарных векторов.
     p – массив вероятностей P(X_i = 1) длины n.
     """
-    n = len(p)
-    U = np.random.rand(N, n)
-    X = (U / (1-p)).astype(int)
+    rep = np.asarray(rep_2d, dtype=np.int8).reshape(-1, 1)  # (n,1)
+    n = rep.shape[0]
+    flips = (rng.random(size=(n, N)) < p).astype(np.int8)
+    X = rep ^ flips
     return X
 
 def estimate_params(X):
