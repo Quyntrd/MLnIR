@@ -85,7 +85,9 @@ M1_est, B1_est = estimate_params(X1)
 M2_est, B2_est = estimate_params(X2)
 
 rho_b_eq = bhattacharyya_distance(M1_est, B1_est, M2_est, B2_est)
-rho_m_eq = mahalanobis_distance(M1_est, M2_est, B_equal)
+
+B_avg_est = (B1_est + B2_est) / 2
+rho_m_eq = mahalanobis_distance(M1_est, M2_est, B_avg_est)
 
 print("------------------------ Равные корреляционные матрицы ------------------------")
 print("Исходные M1:", M1, "M2:", M2)
@@ -163,4 +165,4 @@ print("Фактическая доля изменённых битов для v1
 
 p2_proto = proto2.flatten()
 change_rate2 = np.mean(bin_vecs_2 != p2_proto)
-print("Фактическая доля изменённых битов для v1:", change_rate2)
+print("Фактическая доля изменённых битов для v2:", change_rate2)

@@ -41,7 +41,7 @@ def simulate_binary_vector(rep_2d: np.ndarray, N: int, p: float, rng: np.random.
     """
     rep = np.asarray(rep_2d, dtype=np.int8).reshape(-1, 1)  # (n,1)
     n = rep.shape[0]
-    flips = (rng.random(size=(n, N)) < p).astype(np.int8)
+    flips = np.floor(rng.random(size=(n, N)) < p).astype(np.int8)
     X = rep ^ flips
     return X
 
