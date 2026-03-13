@@ -8,9 +8,9 @@ LOG_PATH = "logs\\"
 rng = np.random.default_rng(7)  # чтобы результаты воспроизводились
 N = 200
 
-M1 = np.array([1.0, 0.0]) # 11 вариант
-M2 = np.array([-2.0, -2.0])
-M3 = np.array([1.0, 2.0])
+M1 = np.array([1.0, 0.0])
+M2 = np.array([-1.0, -1.0])
+M3 = np.array([1.0, 2.0])   
 
 B1 = np.array([[1.0, -0.9],
                [-0.9, 1.0]])
