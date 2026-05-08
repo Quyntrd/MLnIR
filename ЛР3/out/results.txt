@@ -1,0 +1,9 @@
+Лабораторная 3
+---------------
+Равные ковариации: Bayes=0.0275, Fisher=0.0325, MSE=0.0325, RM=0.0325
+Неравные ковариации: Bayes=0.0000, Fisher=0.0125, MSE=0.0125, RM=0.0125
+
+Файлы графиков:
+lab3_equal_linear.png
+lab3_unequal_linear.png
+lab3_rm_convergence.png
